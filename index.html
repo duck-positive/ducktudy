@@ -9,18 +9,12 @@ layout: null
   <title>Ducktudy - Android &amp; Flutter 심화 기술 블로그</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif;
       background: #f5f0e8;
       overflow-x: hidden;
     }
-
-    .hero {
-      height: 280vh;
-      position: relative;
-    }
-
+    .hero { height: 280vh; position: relative; }
     .sticky-scene {
       position: sticky;
       top: 0;
@@ -32,7 +26,6 @@ layout: null
       align-items: center;
       justify-content: center;
     }
-
     .blog-title {
       font-size: clamp(1.4rem, 3.5vw, 2.2rem);
       font-weight: 800;
@@ -41,55 +34,37 @@ layout: null
       z-index: 2;
       position: relative;
       text-align: center;
-      letter-spacing: -0.5px;
     }
-
     .chars-stage {
       position: relative;
       width: 100%;
       height: 280px;
-      display: flex;
-      align-items: center;
     }
-
     .char {
       position: absolute;
       top: 0;
-      overflow: hidden;
-      height: 280px;
     }
-
-    .char img {
-      height: 280px;
-      width: auto;
-      display: block;
-      user-select: none;
-      pointer-events: none;
-    }
-
     #char-left  { left: 0; }
     #char-right { right: 0; }
-
+    canvas { display: block; }
     .collision-burst {
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 120px;
-      height: 120px;
+      width: 130px;
+      height: 130px;
       transform: translate(-50%, -50%) scale(0);
-      background: radial-gradient(circle, #FFE500 0%, #FF8C00 40%, transparent 70%);
+      background: radial-gradient(circle, #FFE500 0%, #FF8C00 45%, transparent 70%);
       border-radius: 50%;
       pointer-events: none;
       z-index: 5;
       opacity: 0;
-      transition: transform 0.25s ease-out, opacity 0.25s ease-out;
+      transition: transform 0.28s ease-out, opacity 0.28s ease-out;
     }
-
     .collision-burst.pop {
-      transform: translate(-50%, -50%) scale(1);
+      transform: translate(-50%, -50%) scale(1.8);
       opacity: 1;
     }
-
     .scroll-hint {
       position: absolute;
       bottom: 48px;
@@ -101,13 +76,10 @@ layout: null
       transition: opacity 0.3s;
       animation: hintFloat 2s ease-in-out infinite;
     }
-
     @keyframes hintFloat {
       0%, 100% { opacity: 0.9; transform: translateY(0); }
       50%       { opacity: 0.4; transform: translateY(5px); }
     }
-
-    /* ── POSTS ── */
     .posts-section {
       background: white;
       min-height: 100vh;
@@ -116,7 +88,6 @@ layout: null
       z-index: 10;
       box-shadow: 0 -8px 32px rgba(0,0,0,0.08);
     }
-
     .posts-inner {
       max-width: 720px;
       margin: 0 auto;
@@ -125,7 +96,6 @@ layout: null
       transition: opacity 0.55s ease, transform 0.55s ease;
     }
     .posts-inner.visible { opacity: 1; transform: translateY(0); }
-
     .posts-header {
       font-size: 1.5rem;
       font-weight: 700;
@@ -134,7 +104,6 @@ layout: null
       padding-bottom: 0.8rem;
       border-bottom: 3px solid #e8a000;
     }
-
     .post-card {
       display: block;
       padding: 1.4rem 1.6rem;
@@ -150,12 +119,10 @@ layout: null
       box-shadow: 0 8px 28px rgba(0,0,0,0.09);
       border-color: #e8a000;
     }
-
     .post-title   { font-size: 1.05rem; font-weight: 600; color: #1a1a2e; margin-bottom: 0.4rem; }
     .post-meta    { font-size: 0.82rem; color: #999; margin-bottom: 0.5rem; }
     .post-excerpt { font-size: 0.88rem; color: #666; line-height: 1.65; }
     .no-posts     { text-align: center; color: #bbb; padding: 4rem 0; }
-
     .footer {
       text-align: center;
       padding: 2rem;
@@ -170,23 +137,11 @@ layout: null
 <div class="hero">
   <div class="sticky-scene">
     <h1 class="blog-title">Ducktudy</h1>
-
     <div class="chars-stage" id="chars-stage">
-      <div class="char" id="char-left">
-        <img id="img-left"
-             src="https://upload.wikimedia.org/wikipedia/commons/3/35/Pat_Mat.jpg"
-             alt="Pat" crossorigin="anonymous">
-      </div>
-
-      <div class="char" id="char-right">
-        <img id="img-right"
-             src="https://upload.wikimedia.org/wikipedia/commons/3/35/Pat_Mat.jpg"
-             alt="Mat" crossorigin="anonymous">
-      </div>
-
+      <div class="char" id="char-left"><canvas id="canvas-left"></canvas></div>
+      <div class="char" id="char-right"><canvas id="canvas-right"></canvas></div>
       <div class="collision-burst" id="burst"></div>
     </div>
-
     <div class="scroll-hint" id="scroll-hint">스크롤하면 만나요 ↓</div>
   </div>
 </div>
@@ -217,90 +172,130 @@ layout: null
 
 <script>
 (function () {
-  var SPLIT = 0.48; // 이미지 좌/우 분할 비율 (Pat 왼쪽 캐릭터가 약 48% 차지)
-  var CHAR_H = 260; // 캐릭터 표시 높이(px)
+  var SPLIT  = 0.48;
+  var CHAR_H = 260;
+  var BG_TOL = 150;
 
   var charLeft   = document.getElementById('char-left');
   var charRight  = document.getElementById('char-right');
-  var imgLeft    = document.getElementById('img-left');
-  var imgRight   = document.getElementById('img-right');
+  var cvLeft     = document.getElementById('canvas-left');
+  var cvRight    = document.getElementById('canvas-right');
   var burst      = document.getElementById('burst');
   var postsInner = document.getElementById('posts-inner');
   var scrollHint = document.getElementById('scroll-hint');
 
-  var charW = 0;
-  var ready = false;
-  var prevTouching = false;
+  var leftW = 0, rightW = 0, ready = false, prevTouching = false;
 
-  function setup() {
-    if (ready) return;
-    var nw = imgLeft.naturalWidth, nh = imgLeft.naturalHeight;
-    if (!nw || !nh) return;
+  function removeBackground(imageData, w, h) {
+    var px = imageData.data;
+    function idx(x, y) { return (y * w + x) * 4; }
+    function getC(x, y) { var i = idx(x,y); return [px[i], px[i+1], px[i+2]]; }
+    function diff(a, b) { return Math.abs(a[0]-b[0]) + Math.abs(a[1]-b[1]) + Math.abs(a[2]-b[2]); }
 
-    var scale    = CHAR_H / nh;
-    var fullW    = nw * scale;
-    var leftW    = fullW * SPLIT;
-    var rightW   = fullW * (1 - SPLIT);
+    var corners = [[0,0],[w-1,0],[0,h-1],[w-1,h-1]];
+    var sR=0, sG=0, sB=0;
+    corners.forEach(function(c){ var cl=getC(c[0],c[1]); sR+=cl[0]; sG+=cl[1]; sB+=cl[2]; });
+    var bg = [sR/4, sG/4, sB/4];
 
-    // Left: show left portion
-    imgLeft.style.height = CHAR_H + 'px';
-    imgLeft.style.width  = 'auto';
-    charLeft.style.width  = leftW + 'px';
-    charLeft.style.height = CHAR_H + 'px';
+    var visited = new Uint8Array(w * h);
+    var queue = [];
+    corners.forEach(function(c){
+      if (!visited[c[1]*w+c[0]]) { visited[c[1]*w+c[0]]=1; queue.push(c[0],c[1]); }
+    });
 
-    // Right: show right portion by shifting image left
-    imgRight.style.height     = CHAR_H + 'px';
-    imgRight.style.width      = 'auto';
-    imgRight.style.marginLeft = '-' + leftW + 'px';
-    charRight.style.width  = rightW + 'px';
-    charRight.style.height = CHAR_H + 'px';
-
-    charW = Math.max(leftW, rightW);
-    ready = true;
-    tick();
+    var qh = 0;
+    while (qh < queue.length) {
+      var cx = queue[qh++], cy = queue[qh++];
+      var ci = idx(cx, cy);
+      px[ci+3] = 0;
+      var ns = [[cx-1,cy],[cx+1,cy],[cx,cy-1],[cx,cy+1]];
+      for (var k=0; k<4; k++) {
+        var nx=ns[k][0], ny=ns[k][1];
+        if (nx<0||nx>=w||ny<0||ny>=h) continue;
+        var ni = ny*w+nx;
+        if (visited[ni]) continue;
+        if (diff(getC(nx,ny), bg) < BG_TOL) { visited[ni]=1; queue.push(nx,ny); }
+      }
+    }
   }
 
-  imgLeft.addEventListener('load', setup);
-  if (imgLeft.complete && imgLeft.naturalWidth) setup();
+  var img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = function() {
+    var nw = img.naturalWidth, nh = img.naturalHeight;
+    var scale = CHAR_H / nh;
+    var splitPx = Math.round(nw * SPLIT);
+    var rw = nw - splitPx;
 
-  function clamp(v, a, b) { return Math.min(Math.max(v, a), b); }
-  function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+    var tmp = document.createElement('canvas');
+    tmp.width = nw; tmp.height = nh;
+    var ctx = tmp.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+
+    // Left half
+    var ld = ctx.getImageData(0, 0, splitPx, nh);
+    removeBackground(ld, splitPx, nh);
+    leftW = Math.round(splitPx * scale);
+    cvLeft.width = leftW; cvLeft.height = CHAR_H;
+    var lt = document.createElement('canvas');
+    lt.width = splitPx; lt.height = nh;
+    lt.getContext('2d').putImageData(ld, 0, 0);
+    cvLeft.getContext('2d').drawImage(lt, 0, 0, splitPx, nh, 0, 0, leftW, CHAR_H);
+
+    // Right half
+    var rd = ctx.getImageData(splitPx, 0, rw, nh);
+    removeBackground(rd, rw, nh);
+    rightW = Math.round(rw * scale);
+    cvRight.width = rightW; cvRight.height = CHAR_H;
+    var rt = document.createElement('canvas');
+    rt.width = rw; rt.height = nh;
+    rt.getContext('2d').putImageData(rd, 0, 0);
+    cvRight.getContext('2d').drawImage(rt, 0, 0, rw, nh, 0, 0, rightW, CHAR_H);
+
+    charLeft.style.width  = leftW  + 'px';
+    charRight.style.width = rightW + 'px';
+    ready = true;
+    tick();
+  };
+  img.src = 'https://upload.wikimedia.org/wikipedia/commons/3/35/Pat_Mat.jpg';
+
+  function clamp(v,a,b){ return Math.min(Math.max(v,a),b); }
+  function ease(t){ return t<0.5 ? 2*t*t : -1+(4-2*t)*t; }
 
   function tick() {
     var scrollY   = window.scrollY;
     var vh        = window.innerHeight;
-    var animStart = vh * 0.15;
-    var animEnd   = vh * 1.6;
-    var raw       = clamp((scrollY - animStart) / (animEnd - animStart), 0, 1);
+    var raw       = clamp((scrollY - vh*0.15) / (vh*1.45), 0, 1);
     var p         = ease(raw);
 
-    var stageW  = document.getElementById('chars-stage').offsetWidth || window.innerWidth;
-    // Maximum travel: start at edge, end when centers meet at screen center
-    var maxMove = stageW / 2 - charW / 2;
-    if (maxMove < 0) maxMove = 0;
+    if (ready) {
+      var stageW = document.getElementById('chars-stage').offsetWidth || window.innerWidth;
+      var center = stageW / 2;
 
-    charLeft.style.transform  = 'translateX('  + (maxMove * p) + 'px)';
-    charRight.style.transform = 'translateX(-' + (maxMove * p) + 'px)';
+      // 왼쪽 캐릭터: 오른쪽 경계가 center에 닿도록
+      // → translateX = center - leftW
+      var lMove = Math.max(center - leftW, 0);
+      // 오른쪽 캐릭터: 왼쪽 경계가 center에 닿도록
+      // → translateX = -(center - rightW)
+      var rMove = Math.max(center - rightW, 0);
+
+      charLeft.style.transform  = 'translateX('  + (lMove * p) + 'px)';
+      charRight.style.transform = 'translateX(-' + (rMove * p) + 'px)';
+    }
 
     var touching = raw >= 0.92;
-
     if (touching && !prevTouching) {
       burst.classList.add('pop');
-      setTimeout(function () { burst.classList.remove('pop'); }, 350);
+      setTimeout(function(){ burst.classList.remove('pop'); }, 400);
     }
     prevTouching = touching;
 
-    if (touching) {
-      postsInner.classList.add('visible');
-      scrollHint.style.opacity = '0';
-    } else {
-      postsInner.classList.remove('visible');
-      scrollHint.style.opacity = '1';
-    }
+    postsInner.classList.toggle('visible', touching);
+    scrollHint.style.opacity = touching ? '0' : '1';
   }
 
   window.addEventListener('scroll', tick, { passive: true });
-  window.addEventListener('resize', function () { ready = false; setup(); });
+  window.addEventListener('resize', tick);
   tick();
 })();
 </script>
