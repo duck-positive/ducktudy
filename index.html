@@ -1,0 +1,296 @@
+---
+layout: null
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ducktudy - Android &amp; Flutter 심화 기술 블로그</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif;
+      background: #E8F4FD;
+      overflow-x: hidden;
+    }
+
+    .hero {
+      height: 220vh;
+      position: relative;
+    }
+
+    .sticky-duck {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #87CEEB 0%, #B0E2FF 80%, #5BA4CF 100%);
+      overflow: hidden;
+    }
+
+    .sticky-duck::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: -10%;
+      right: -10%;
+      height: 90px;
+      background: #5BA4CF;
+      border-radius: 50% 50% 0 0 / 30px 30px 0 0;
+    }
+
+    .blog-title {
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      font-weight: 800;
+      color: #1a5f8a;
+      margin-bottom: 1.2rem;
+      text-shadow: 0 2px 6px rgba(255,255,255,0.6);
+      z-index: 1;
+      letter-spacing: -0.5px;
+    }
+
+    .duck-wrapper {
+      z-index: 1;
+      width: min(260px, 65vw);
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.18));
+    }
+
+    #duck-svg { width: 100%; height: auto; }
+
+    .scroll-hint {
+      z-index: 1;
+      margin-top: 1.8rem;
+      color: #1a5f8a;
+      font-size: 0.88rem;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      animation: fadeUpDown 2s ease-in-out infinite;
+    }
+
+    .scroll-arrow { font-size: 1.4rem; }
+
+    @keyframes fadeUpDown {
+      0%, 100% { opacity: 1; transform: translateY(0); }
+      50% { opacity: 0.5; transform: translateY(6px); }
+    }
+
+    .posts-section {
+      background: white;
+      min-height: 100vh;
+      padding: 64px 20px 100px;
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 -8px 32px rgba(0,0,0,0.08);
+    }
+
+    .posts-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+
+    .posts-inner.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .posts-header {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 2rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 3px solid #FF8C00;
+    }
+
+    .post-card {
+      display: block;
+      padding: 1.4rem 1.6rem;
+      margin-bottom: 1rem;
+      border: 1.5px solid #f0f0f0;
+      border-radius: 14px;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .post-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.09);
+      border-color: #FF8C00;
+    }
+
+    .post-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 0.45rem;
+      line-height: 1.4;
+    }
+
+    .post-meta {
+      font-size: 0.82rem;
+      color: #999;
+      margin-bottom: 0.55rem;
+    }
+
+    .post-excerpt {
+      font-size: 0.88rem;
+      color: #666;
+      line-height: 1.65;
+    }
+
+    .no-posts {
+      text-align: center;
+      color: #bbb;
+      padding: 4rem 0;
+      font-size: 1rem;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      color: #bbb;
+      font-size: 0.8rem;
+      background: white;
+    }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="sticky-duck">
+    <h1 class="blog-title">🦆 Ducktudy</h1>
+
+    <div class="duck-wrapper">
+      <svg id="duck-svg" viewBox="0 0 200 265" xmlns="http://www.w3.org/2000/svg">
+        <!-- 그림자 -->
+        <ellipse cx="100" cy="262" rx="52" ry="6" fill="rgba(0,0,0,0.10)"/>
+
+        <!-- 몸통 -->
+        <ellipse cx="100" cy="202" rx="62" ry="52" fill="white"/>
+        <ellipse cx="100" cy="202" rx="62" ry="52" fill="none" stroke="#E8E8E8" stroke-width="1.5"/>
+
+        <!-- 날개 (좌) -->
+        <ellipse cx="46" cy="205" rx="17" ry="30" fill="#F2F2F2" stroke="#E0E0E0" stroke-width="1" transform="rotate(-18, 46, 205)"/>
+        <!-- 날개 (우) -->
+        <ellipse cx="154" cy="205" rx="17" ry="30" fill="#F2F2F2" stroke="#E0E0E0" stroke-width="1" transform="rotate(18, 154, 205)"/>
+
+        <!-- 목 -->
+        <ellipse cx="100" cy="162" rx="26" ry="16" fill="white"/>
+
+        <!-- 머리 -->
+        <circle cx="100" cy="116" r="44" fill="white"/>
+        <circle cx="100" cy="116" r="44" fill="none" stroke="#E8E8E8" stroke-width="1.5"/>
+
+        <!-- 볼 홍조 -->
+        <ellipse cx="70" cy="125" rx="11" ry="7" fill="#FFB6C1" opacity="0.55"/>
+        <ellipse cx="130" cy="125" rx="11" ry="7" fill="#FFB6C1" opacity="0.55"/>
+
+        <!-- 눈 -->
+        <circle cx="82" cy="107" r="9" fill="#222"/>
+        <circle cx="118" cy="107" r="9" fill="#222"/>
+        <!-- 눈 하이라이트 (큰) -->
+        <circle cx="85" cy="104" r="3.5" fill="white"/>
+        <circle cx="121" cy="104" r="3.5" fill="white"/>
+        <!-- 눈 하이라이트 (작은) -->
+        <circle cx="80" cy="111" r="1.5" fill="white" opacity="0.45"/>
+        <circle cx="116" cy="111" r="1.5" fill="white" opacity="0.45"/>
+
+        <!-- 부리 위쪽 (pivot: 100, 130) -->
+        <g id="beak-upper" style="transform-origin: 100px 130px">
+          <path d="M 80 130 Q 100 118 120 130 L 100 126 Z" fill="#FF8C00"/>
+          <path d="M 86 127 Q 100 119 114 127" fill="none" stroke="#FFA040" stroke-width="1.5" stroke-linecap="round"/>
+        </g>
+
+        <!-- 부리 아래쪽 (pivot: 100, 130) -->
+        <g id="beak-lower" style="transform-origin: 100px 130px">
+          <path d="M 80 130 Q 100 142 120 130 L 100 134 Z" fill="#E87A00"/>
+          <!-- 혀 (입 열렸을 때만 보임) -->
+          <ellipse id="tongue" cx="100" cy="137" rx="8" ry="4" fill="#E05050" opacity="0"/>
+        </g>
+
+        <!-- 발 -->
+        <path d="M 80 250 L 72 258 L 78 256 L 81 260 L 85 256 L 89 260 L 88 250 Z" fill="#FF8C00"/>
+        <path d="M 120 250 L 112 258 L 118 256 L 121 260 L 125 256 L 129 260 L 128 250 Z" fill="#FF8C00"/>
+      </svg>
+    </div>
+
+    <div class="scroll-hint">
+      <span>스크롤하세요</span>
+      <span class="scroll-arrow">↓</span>
+    </div>
+  </div>
+</div>
+
+<div class="posts-section">
+  <div class="posts-inner" id="posts-inner">
+    <h2 class="posts-header">📚 최근 포스트</h2>
+
+    {% if site.posts.size > 0 %}
+      {% for post in site.posts %}
+      <a class="post-card" href="{{ post.url | prepend: site.baseurl }}">
+        <div class="post-title">{{ post.title }}</div>
+        <div class="post-meta">
+          {{ post.date | date: "%Y년 %m월 %d일" }}
+          {% if post.categories %}· {{ post.categories | join: ", " }}{% endif %}
+        </div>
+        {% if post.excerpt %}
+        <div class="post-excerpt">{{ post.excerpt | strip_html | truncate: 120 }}</div>
+        {% endif %}
+      </a>
+      {% endfor %}
+    {% else %}
+      <div class="no-posts">🦆 아직 포스트가 없습니다. 곧 업데이트 예정이에요!</div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="footer">
+  Ducktudy · Android &amp; Flutter 심화 기술 블로그 · Powered by Claude Code
+</div>
+
+<script>
+  const beakUpper  = document.getElementById('beak-upper');
+  const beakLower  = document.getElementById('beak-lower');
+  const tongue     = document.getElementById('tongue');
+  const postsInner = document.getElementById('posts-inner');
+
+  function clamp(v, lo, hi) { return Math.min(Math.max(v, lo), hi); }
+  function easeInOut(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+
+  window.addEventListener('scroll', function() {
+    var scrollY  = window.scrollY;
+    var viewH    = window.innerHeight;
+    var animStart = viewH * 0.25;
+    var animEnd   = viewH * 1.1;
+    var raw      = clamp((scrollY - animStart) / (animEnd - animStart), 0, 1);
+    var progress = easeInOut(raw);
+    var angle    = progress * 32;
+
+    beakUpper.style.transform = 'rotate(-' + angle + 'deg)';
+    beakLower.style.transform = 'rotate('  + angle + 'deg)';
+    tongue.style.opacity = progress > 0.6 ? (progress - 0.6) / 0.4 * 0.85 : 0;
+
+    if (raw > 0.7) {
+      postsInner.classList.add('visible');
+    } else {
+      postsInner.classList.remove('visible');
+    }
+  });
+
+  window.dispatchEvent(new Event('scroll'));
+</script>
+
+</body>
+</html>
