@@ -1,0 +1,7 @@
+title: Ducktudy
+description: Android & Flutter 심화 기술 블로그
+baseurl: "/ducktudy"
+url: "https://duck-positive.github.io"
+theme: minima
+lang: ko
+permalink: /:year/:month/:day/:title/
