@@ -100,9 +100,31 @@ layout: null
       font-size: 1.5rem;
       font-weight: 700;
       color: #1a1a2e;
-      margin-bottom: 2rem;
+      margin-bottom: 1.2rem;
       padding-bottom: 0.8rem;
       border-bottom: 3px solid #e8a000;
+    }
+    .category-filter {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.8rem;
+      flex-wrap: wrap;
+    }
+    .cat-btn {
+      padding: 0.35rem 1.1rem;
+      border-radius: 100px;
+      border: 1.5px solid #e8a000;
+      background: white;
+      color: #a07830;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      font-family: inherit;
+    }
+    .cat-btn.active, .cat-btn:hover {
+      background: #e8a000;
+      color: white;
     }
     .post-card {
       display: block;
@@ -142,16 +164,22 @@ layout: null
       <div class="char" id="char-right"><canvas id="canvas-right"></canvas></div>
       <div class="collision-burst" id="burst"></div>
     </div>
-    <div class="scroll-hint" id="scroll-hint">스크롤하면 만나요 ↓</div>
+    <div class="scroll-hint" id="scroll-hint">스크롤해주세요 ↓</div>
   </div>
 </div>
 
 <div class="posts-section">
   <div class="posts-inner" id="posts-inner">
     <h2 class="posts-header">📚 최근 포스트</h2>
+    <div class="category-filter">
+      <button class="cat-btn active" onclick="filterCat(this,'전체')">전체</button>
+      <button class="cat-btn" onclick="filterCat(this,'flutter')">Flutter</button>
+      <button class="cat-btn" onclick="filterCat(this,'android')">Android</button>
+      <button class="cat-btn" onclick="filterCat(this,'ai')">AI</button>
+    </div>
     {% if site.posts.size > 0 %}
       {% for post in site.posts %}
-      <a class="post-card" href="{{ post.url | prepend: site.baseurl }}">
+      <a class="post-card" href="{{ post.url | prepend: site.baseurl }}" data-categories="{{ post.categories | join: ' ' }}">
         <div class="post-title">{{ post.title }}</div>
         <div class="post-meta">
           {{ post.date | date: "%Y년 %m월 %d일" }}
@@ -171,6 +199,15 @@ layout: null
 <div class="footer">Ducktudy · Android &amp; Flutter 심화 기술 블로그</div>
 
 <script>
+function filterCat(btn, cat) {
+  document.querySelectorAll('.cat-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.querySelectorAll('.post-card').forEach(function(card){
+    var cats = card.getAttribute('data-categories') || '';
+    card.style.display = (cat === '전체' || cats.split(' ').indexOf(cat) !== -1) ? '' : 'none';
+  });
+}
+
 (function () {
   var SPLIT  = 0.48;
   var CHAR_H = 260;
@@ -232,7 +269,6 @@ layout: null
     var ctx = tmp.getContext('2d');
     ctx.drawImage(img, 0, 0);
 
-    // Left half
     var ld = ctx.getImageData(0, 0, splitPx, nh);
     removeBackground(ld, splitPx, nh);
     leftW = Math.round(splitPx * scale);
@@ -242,7 +278,6 @@ layout: null
     lt.getContext('2d').putImageData(ld, 0, 0);
     cvLeft.getContext('2d').drawImage(lt, 0, 0, splitPx, nh, 0, 0, leftW, CHAR_H);
 
-    // Right half
     var rd = ctx.getImageData(splitPx, 0, rw, nh);
     removeBackground(rd, rw, nh);
     rightW = Math.round(rw * scale);
@@ -271,14 +306,8 @@ layout: null
     if (ready) {
       var stageW = document.getElementById('chars-stage').offsetWidth || window.innerWidth;
       var center = stageW / 2;
-
-      // 왼쪽 캐릭터: 오른쪽 경계가 center에 닿도록
-      // → translateX = center - leftW
       var lMove = Math.max(center - leftW, 0);
-      // 오른쪽 캐릭터: 왼쪽 경계가 center에 닿도록
-      // → translateX = -(center - rightW)
       var rMove = Math.max(center - rightW, 0);
-
       charLeft.style.transform  = 'translateX('  + (lMove * p) + 'px)';
       charRight.style.transform = 'translateX(-' + (rMove * p) + 'px)';
     }
