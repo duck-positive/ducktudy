@@ -62,7 +62,6 @@ Figma MCP는 설치 후 두 가지 도구를 핵심으로 사용합니다.
 | 도구 | 역할 |
 |------|------|
 | `get_design_context` | 레이아웃, 색상, 타이포그래피, 컴포넌트 구조를 JSON으로 추출 |
-| `get_screenshot` | 시각적 레퍼런스 이미지 반환 |
 
 URL에서 `node-id`를 파싱할 때 주의할 점이 있습니다. URL의 `-`를 `:`로 변환해야 합니다.
 
@@ -101,16 +100,23 @@ Skill을 호출하면:
 해결 구조:
 
 ```
+Phase 0: 스냅샷 조회
+  → .claude/figma_snapshot.json에서 nodeId 조회
+  → 없으면 "new" (전체 구현) / 있으면 "diff" (변경 부분만 수정)
+
 Phase 1: Explore 에이전트 (Figma 분석)
-  → get_design_context + get_screenshot 동시 호출
+  → get_design_context 호출
+  → "diff" 모드일 때 이전 스냅샷과 비교해 변경 항목만 식별
   → 구조화된 요약만 반환 (원문은 에이전트 컨텍스트에서 소비)
 
 Phase 2: Workflow pipeline (코드 병렬 생성)
-  → 화면 N개를 N개 에이전트가 동시에 파일 작성
+  → "new": 화면 전체 코드 생성
+  → "diff": 변경된 항목만 기존 파일에 반영
   → 벽시계 시간 = 가장 느린 화면 하나 기준
 
-Phase 3: 메인 컨텍스트 (hot reload)
+Phase 3: 메인 컨텍스트 (hot reload + 스냅샷 갱신)
   → DTD 연결은 세션에 묶임 → 반드시 메인에서 실행
+  → hot reload 성공 후 .claude/figma_snapshot.json 갱신
 ```
 
 ---
@@ -125,15 +131,24 @@ name: figma-flutter
 description: Figma 디자인을 Flutter 코드로 구현하고 hot reload
 ---
 
+## Phase 0: 스냅샷 조회
+.claude/figma_snapshot.json에서 nodeId 조회 → mode: "new" / "diff" 결정
+
 ## Phase 1: Figma 분석 (Explore 에이전트)
-Explore 에이전트를 spawn → get_design_context + get_screenshot 동시 호출
-→ { screens: [{ name, layout, colors, textStyles, spacing }] } 반환
+Explore 에이전트를 spawn → get_design_context 호출
+"diff"이면 이전 스냅샷 전달 → 변경 항목만 식별
+→ { screens: [{ name, nodeId, isNew, changes, layout, colors, textStyles, spacing }] } 반환
 
 ## Phase 2: 코드 생성 (Workflow)
-pipeline(screens, screen => agent(generateCode(screen)))
+pipeline(screens, screen =>
+  screen.isNew
+    ? agent(전체 구현)
+    : agent(변경 항목만 기존 파일에 반영)
+)
 
-## Phase 3: hot reload (메인 컨텍스트)
+## Phase 3: hot reload + 스냅샷 갱신 (메인 컨텍스트)
 dtd(listDtdUris) → connect → hot_reload(clearRuntimeErrors: true)
+.claude/figma_snapshot.json에 nodeId 키로 갱신 저장
 ```
 
 ---
