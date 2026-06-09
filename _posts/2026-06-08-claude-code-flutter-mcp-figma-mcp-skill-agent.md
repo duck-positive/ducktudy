@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Claude Code에서 Flutter MCP + Figma MCP 연동하기 — Skill과 Agent 활용 구조"
+title: "Claude Code에서 Dart MCP + Figma MCP 연동하기 — Skill과 Agent 활용 구조"
 date: 2026-06-08
 categories: [ai, flutter]
 tags: [claude, mcp, flutter, figma, dart, fvm, skill, agent, workflow]
