@@ -208,7 +208,7 @@ void demonstrateFreezed() {
 
 ### 4.2 예제 2: Union 타입으로 API 상태 관리
 
-Freezed의 真髓는 Union 타입입니다. API 응답을 상태별로 타입 안전하게 표현하고, Dart 3 Pattern Matching과 결합하면 exhaustive 체크까지 가능합니다.
+Freezed의 진수는 Union 타입입니다. API 응답을 상태별로 타입 안전하게 표현하고, Dart 3 Pattern Matching과 결합하면 exhaustive 체크까지 가능합니다.
 
 ```dart
 // lib/models/api_result.dart

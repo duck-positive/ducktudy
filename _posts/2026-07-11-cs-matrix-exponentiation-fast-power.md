@@ -123,6 +123,7 @@ int main() {
 
 ## 구현 2: 행렬 거듭제곱 — 피보나치 O(log N)
 
+{% raw %}
 ```cpp
 #include <bits/stdc++.h>
 using namespace std;
@@ -185,6 +186,7 @@ int main() {
     return 0;
 }
 ```
+{% endraw %}
 
 ### 피보나치 점화식의 행렬 유도
 
@@ -309,6 +311,7 @@ int main() {
 
 인접 행렬 A에서 A^k의 `[i][j]` 원소는 **정점 i에서 j까지 정확히 k번의 간선을 사용하는 경로 수**다.
 
+{% raw %}
 ```cpp
 #include <bits/stdc++.h>
 using namespace std;
@@ -371,6 +374,7 @@ int main() {
     return 0;
 }
 ```
+{% endraw %}
 
 ---
 
