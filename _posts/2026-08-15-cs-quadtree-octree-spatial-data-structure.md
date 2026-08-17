@@ -27,7 +27,7 @@ tags: [quadtree, octree, spatial-index, data-structure, game-engine, collision-d
 선형 구조로 공간 데이터를 관리하면 범위 검색(Range Query)이나 최근접 이웃 검색(Nearest Neighbor Query) 시 모든 원소를 순회해야 합니다. N개의 점이 있을 때 순진한 방법은 O(N)이지만, 쿼드트리를 사용하면 다음과 같은 개선이 가능합니다.
 
 | 연산 | 순진한 방법 | 쿼드트리 (균형 시) |
-|------|-----------|-----------------|
+|------|-----------|------------------|
 | 삽입 | O(1) | O(log N) |
 | 점 검색 | O(N) | O(log N) |
 | 범위 검색 | O(N) | O(√N + K) |
