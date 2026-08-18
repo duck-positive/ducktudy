@@ -113,7 +113,7 @@ ICU(International Components for Unicode) 메시지 포맷은 복수형, 성별 
 ### app_ko.arb
 
 ```json
-{
+{% raw %}{
   "@@locale": "ko",
 
   "welcomeTitle": "환영합니다",
@@ -162,13 +162,13 @@ ICU(International Components for Unicode) 메시지 포맷은 복수형, 성별 
       }
     }
   }
-}
+}{% endraw %}
 ```
 
 ### app_en.arb
 
 ```json
-{
+{% raw %}{
   "@@locale": "en",
   "welcomeTitle": "Welcome",
   "newMessageAlert": "{count, plural, =0{No new messages} =1{1 new message} other{{count} new messages}}",
@@ -199,7 +199,7 @@ ICU(International Components for Unicode) 메시지 포맷은 복수형, 성별 
       }
     }
   }
-}
+}{% endraw %}
 ```
 
 ### Dart 사용 코드
@@ -461,7 +461,7 @@ ls lib/l10n/generated/
 한국어와 영어는 복수형이 2종류지만, 아랍어는 CLDR 기준 6종류(`zero`, `one`, `two`, `few`, `many`, `other`)입니다. 아랍어를 지원한다면 ARB에 모든 케이스를 정의하세요.
 
 ```json
-"itemCountAr": "{count, plural, =0{لا توجد عناصر} one{عنصر واحد} two{عنصران} few{{count} عناصر} many{{count} عنصرًا} other{{count} عنصر}}"
+{% raw %}"itemCountAr": "{count, plural, =0{لا توجد عناصر} one{عنصر واحد} two{عنصران} few{{count} عناصر} many{{count} عنصرًا} other{{count} عنصر}}"{% endraw %}
 ```
 
 ### 6. 테스트에서 로케일 주입

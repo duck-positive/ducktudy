@@ -337,7 +337,7 @@ JsonParsingBenchmark.kotlinSerializationParsing
 벤치마크를 한 번 실행하는 것만으로는 부족하다. **PR마다 성능 회귀 여부를 자동으로 탐지**하는 것이 핵심이다.
 
 ```yaml
-# .github/workflows/benchmark.yml
+{% raw %}# .github/workflows/benchmark.yml
 name: Performance Benchmarks
 
 on:
@@ -374,7 +374,7 @@ jobs:
           alert-threshold: '150%'  # 기준값 대비 50% 이상 악화 시 알림
           fail-on-alert: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          comment-on-alert: true
+          comment-on-alert: true{% endraw %}
 ```
 
 ---

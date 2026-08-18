@@ -334,7 +334,7 @@ if __name__ == "__main__":
 3. **overlayfs + chroot**: 컨테이너 파일 시스템 격리
 
 ```bash
-# Docker inspect로 실제 cgroup 경로 확인
+{% raw %}# Docker inspect로 실제 cgroup 경로 확인
 docker run -d --name test-container --cpus=0.5 --memory=256m nginx
 
 # Docker가 생성한 cgroup 확인
@@ -353,7 +353,7 @@ ls -la /proc/$PID/ns/
 
 # 컨테이너의 namespace에서 명령 실행 (nsenter)
 sudo nsenter --target $PID --pid --net --mount -- /bin/sh
-# 이제 컨테이너 내부에서 실행하는 것과 동일
+# 이제 컨테이너 내부에서 실행하는 것과 동일{% endraw %}
 ```
 
 ### 4.1 overlayfs: 컨테이너 이미지 레이어
