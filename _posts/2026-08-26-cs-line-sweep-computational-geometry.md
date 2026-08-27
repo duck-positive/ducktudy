@@ -42,6 +42,7 @@ n개의 축 정렬 직사각형이 겹칠 때 전체 덮인 넓이를 O(n log n)
 
 ### 예제 1: C++ — 구간 합집합 길이 계산
 
+{% raw %}
 ```cpp
 #include <bits/stdc++.h>
 using namespace std;
@@ -150,6 +151,7 @@ int main() {
     return 0;
 }
 ```
+{% endraw %}
 
 ### 예제 2: Python — 선분 교차 존재 여부 검사 (Shamos-Hoey)
 
