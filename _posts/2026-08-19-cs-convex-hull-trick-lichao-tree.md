@@ -61,6 +61,7 @@ x가 증가할 때 최솟값을 제공하는 직선이 단조적으로 바뀐다
 
 기울기가 단조 감소하고 쿼리 x도 단조 증가하는 경우, 덱(deque)을 이용해 O(N) 시간에 해결한다.
 
+{% raw %}
 ```cpp
 #include <bits/stdc++.h>
 using namespace std;
@@ -117,6 +118,7 @@ int main() {
     return 0;
 }
 ```
+{% endraw %}
 
 출력:
 ```
