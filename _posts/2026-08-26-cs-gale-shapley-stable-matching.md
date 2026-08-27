@@ -121,6 +121,7 @@ for m, w in enumerate(result):
 
 ### 예제 2: Java 구현 및 안정성 검증
 
+{% raw %}
 ```java
 import java.util.*;
 
@@ -213,6 +214,7 @@ public class GaleShapley {
     }
 }
 ```
+{% endraw %}
 
 ---
 
